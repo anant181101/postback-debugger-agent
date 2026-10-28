@@ -311,14 +311,14 @@ export function App() {
 
       <div className="workspace">
         <header className="topbar">
-          <nav className="crumbs mono">
+          <nav className="crumbs">
             <button type="button" className="crumb" onClick={() => setActiveId(null)}>
               Diagnoses
             </button>
             {activeId && (
               <>
                 <span className="muted">/</span>
-                <span className="crumb-current">{activeId}</span>
+                <span className="crumb-current mono">{activeId}</span>
               </>
             )}
           </nav>

@@ -135,7 +135,7 @@ function Timeline({ context }: { context: ClickContext }) {
           <span className="rail-dot" />
           <div className="rail-body">
             <div className="rail-head">
-              <span className="rail-title mono">{entry.title}</span>
+              <span className="rail-title">{entry.title}</span>
               <span className="rail-time mono" title={formatTime(entry.time)}>
                 {formatOffset(start, entry.time)}
               </span>
@@ -148,7 +148,7 @@ function Timeline({ context }: { context: ClickContext }) {
         <li className="rail-item tone-neutral">
           <span className="rail-dot" />
           <div className="rail-body">
-            <span className="rail-title mono muted">No install ever recorded on this device</span>
+            <span className="rail-title muted">No install ever recorded on this device</span>
           </div>
         </li>
       )}
