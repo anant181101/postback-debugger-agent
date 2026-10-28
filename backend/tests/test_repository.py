@@ -16,7 +16,7 @@ def _click_id(failure_type: FailureType) -> str:
 def test_get_click(db: sqlite3.Connection) -> None:
     click = repository.get_click(db, _click_id(FailureType.TIMEOUT))
     assert click is not None and click.partner_id == "gamma_network"
-    assert repository.get_click(db, "clk_00000000") is None
+    assert repository.get_click(db, "000000000000000000000000") is None
 
 
 def test_get_partner(db: sqlite3.Connection) -> None:

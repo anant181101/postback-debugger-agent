@@ -25,7 +25,7 @@ def _context(db: sqlite3.Connection, failure_type: FailureType):
 
 
 def test_unknown_click_has_no_context(db: sqlite3.Connection) -> None:
-    assert build_click_context(db, "clk_00000000") is None
+    assert build_click_context(db, "000000000000000000000000") is None
 
 
 def test_context_includes_competing_click_and_its_partner(db: sqlite3.Connection) -> None:
@@ -85,7 +85,7 @@ def test_diagnose_click_returns_validated_diagnosis(db: sqlite3.Connection) -> N
 
 def test_diagnose_unknown_click_raises(db: sqlite3.Connection) -> None:
     with pytest.raises(ValueError, match="unknown click_id"):
-        diagnose_click(FakeProvider(), db, "clk_00000000")
+        diagnose_click(FakeProvider(), db, "000000000000000000000000")
 
 
 def test_explain_postback_sends_the_log(db: sqlite3.Connection) -> None:

@@ -79,7 +79,7 @@ def test_explain_prints_text(
 @pytest.mark.parametrize(
     ("args", "message"),
     [
-        (["diagnose", "clk_00000000"], "Unknown click_id"),
+        (["diagnose", "000000000000000000000000"], "Unknown click_id"),
         (["explain", "pb_missing"], "Unknown postback_id"),
     ],
 )
@@ -116,7 +116,7 @@ def test_unreadable_database_is_reported(
 ) -> None:
     empty = tmp_path / "empty.db"
     empty.write_bytes(b"")  # exists, but has no tables
-    assert cli.main(["--db", str(empty), "diagnose", "clk_00000000"]) == 1
+    assert cli.main(["--db", str(empty), "diagnose", "000000000000000000000000"]) == 1
     assert "Database error" in capsys.readouterr().out
 
 

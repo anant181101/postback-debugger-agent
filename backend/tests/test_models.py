@@ -67,7 +67,7 @@ def test_partner_parses_event_mapping_from_json_string() -> None:
 def test_click_parses_strings_into_typed_fields() -> None:
     click = Click.model_validate(
         {
-            "click_id": "clk_1",
+            "click_id": "6ac769a09e4c2a71d35b3c09",
             "partner_id": "alpha_ads",
             "campaign_id": "cmp",
             "app_id": "com.example.app",
@@ -140,3 +140,19 @@ def test_postback_log_consistency_rules(overrides: dict[str, object]) -> None:
 def test_failed_postback_without_response_is_valid() -> None:
     log = _postback(status="failed", http_status=None, response_body=None, error="timeout")
     assert log.error == "timeout"
+
+
+@pytest.mark.parametrize("click_id", ["clk_1", "6AC769A09E4C2A71D35B3C09", "6ac769a09e4c", ""])
+def test_click_id_must_be_an_object_id(click_id: str) -> None:
+    with pytest.raises(ValidationError):
+        Click.model_validate(
+            {
+                "click_id": click_id,
+                "partner_id": "p",
+                "campaign_id": "c",
+                "app_id": "a",
+                "platform": "ios",
+                "device_id": "d",
+                "clicked_at": "2026-10-01T10:00:00Z",
+            }
+        )

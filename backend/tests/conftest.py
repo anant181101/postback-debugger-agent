@@ -55,6 +55,6 @@ class FakeProvider:
 
 
 def click_id_in(prompt: str) -> str:
-    match = re.search(r"click (clk_[0-9a-f]{8})", prompt)
+    match = re.search(r"click ([0-9a-f]{24})", prompt)
     assert match, "prompt does not name the click"
     return match.group(1)

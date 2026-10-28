@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 
 from postback_debugger import repository
 from postback_debugger.data.db import connect, default_db_path
-from postback_debugger.data.models import FailureType, Platform
+from postback_debugger.data.models import OBJECT_ID_PATTERN, FailureType, Platform
 from postback_debugger.data.scenarios import SCENARIOS
 from postback_debugger.diagnosis import ClickContext, Diagnosis, build_click_context, diagnose_click
 from postback_debugger.llm import (
@@ -62,7 +62,11 @@ class ExampleClick(BaseModel):
 
 
 class DiagnoseRequest(BaseModel):
-    click_id: str = Field(min_length=1, max_length=64)
+    click_id: str = Field(
+        pattern=OBJECT_ID_PATTERN,
+        description="24-character hex MongoDB ObjectId",
+        examples=["6ac769a09e4c2a71d35b3c09"],
+    )
     provider: str | None = None
     model: str | None = None
 
