@@ -23,6 +23,7 @@ import { PartnerAvatar } from "./components/PartnerAvatar";
 import { RecentTable, type RecentRun } from "./components/RecentTable";
 import { FAILURE_LABELS, FAILURE_TONES, formatTime } from "./format";
 
+const OBJECT_ID = /^[0-9a-f]{24}$/; // click ids are MongoDB ObjectIds
 const MODEL_KEY = "pbd.model"; // remembered model choice, "provider::model"
 
 function readStoredModel(): string | null {
@@ -115,8 +116,16 @@ export function App() {
   }, []);
 
   async function run(id: string) {
-    const trimmed = id.trim();
+    const trimmed = id.trim().toLowerCase();
     if (!trimmed) return;
+    if (!OBJECT_ID.test(trimmed)) {
+      setActiveId(null);
+      setError({
+        status: 400,
+        message: `"${trimmed}" is not a click ID. Click IDs are 24-character hex MongoDB ObjectIds.`,
+      });
+      return;
+    }
     const current = ++runId.current;
     setActiveId(trimmed);
     setQuery(trimmed);
@@ -210,7 +219,7 @@ export function App() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search click ID…"
+              placeholder="Click ID (24-char ObjectId)"
               aria-label="Click ID"
               spellCheck={false}
             />
@@ -241,18 +250,20 @@ export function App() {
                   >
                     <PartnerAvatar partnerId={ex.partner_id} size={26} />
                     <span className="scenario-text">
-                      <span className="mono scenario-id">{ex.click_id}</span>
-                      <span className="scenario-meta">{ex.partner_id}</span>
+                      <span className="mono scenario-id" title={ex.click_id}>
+                        {ex.click_id}
+                      </span>
+                      <span className="scenario-meta">
+                        {ex.partner_id}
+                        <span className="platform">{ex.platform}</span>
+                      </span>
                     </span>
-                    <span className="scenario-right">
-                      {done && (
-                        <span
-                          className={`led tone-${FAILURE_TONES[done.failureType]}`}
-                          title={FAILURE_LABELS[done.failureType]}
-                        />
-                      )}
-                      <span className="platform">{ex.platform}</span>
-                    </span>
+                    {done && (
+                      <span
+                        className={`led tone-${FAILURE_TONES[done.failureType]}`}
+                        title={FAILURE_LABELS[done.failureType]}
+                      />
+                    )}
                   </button>
                 </li>
               );
@@ -300,14 +311,14 @@ export function App() {
 
       <div className="workspace">
         <header className="topbar">
-          <nav className="crumbs mono">
+          <nav className="crumbs">
             <button type="button" className="crumb" onClick={() => setActiveId(null)}>
               Diagnoses
             </button>
             {activeId && (
               <>
                 <span className="muted">/</span>
-                <span className="crumb-current">{activeId}</span>
+                <span className="crumb-current mono">{activeId}</span>
               </>
             )}
           </nav>
@@ -347,7 +358,11 @@ export function App() {
             <div className="alert" role="alert">
               <IconAlert size={16} />
               <div>
-                <strong>{topError.status === 404 ? "Not found" : "Something went wrong"}</strong>
+                <strong>{topError.status === 404
+                    ? "Not found"
+                    : topError.status === 400
+                      ? "Invalid click ID"
+                      : "Something went wrong"}</strong>
                 <span>{topError.message}</span>
               </div>
             </div>

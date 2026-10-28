@@ -61,7 +61,7 @@ def test_click_context(client: TestClient) -> None:
     body = client.get(f"/api/clicks/{TIMEOUT_CLICK}/context").json()
     assert body["click"]["click_id"] == TIMEOUT_CLICK
     assert len(body["postback_logs"]) == 3
-    assert client.get("/api/clicks/clk_00000000/context").status_code == 404
+    assert client.get("/api/clicks/000000000000000000000000/context").status_code == 404
 
 
 def test_diagnose_returns_diagnosis_usage_and_ground_truth(
@@ -79,7 +79,7 @@ def test_diagnose_returns_diagnosis_usage_and_ground_truth(
 
 
 def test_diagnose_unknown_click_makes_no_model_call(client: TestClient, fake: FakeProvider) -> None:
-    response = client.post("/api/diagnoses", json={"click_id": "clk_00000000"})
+    response = client.post("/api/diagnoses", json={"click_id": "000000000000000000000000"})
     assert response.status_code == 404
     assert fake.calls == []
 
@@ -188,3 +188,11 @@ def test_serves_built_frontend(db_file: Path, fake: FakeProvider, tmp_path: Path
 
     assert client.get("/").text == "<h1>ui</h1>"
     assert client.get("/api/examples").status_code == 200  # API routes still win
+
+
+@pytest.mark.parametrize("click_id", ["clk_f8c6a215", "6AC769A09E4C2A71D35B3C09", "6ac769a0"])
+def test_malformed_click_id_is_rejected_before_any_work(
+    client: TestClient, fake: FakeProvider, click_id: str
+) -> None:
+    assert client.post("/api/diagnoses", json={"click_id": click_id}).status_code == 422
+    assert fake.calls == []

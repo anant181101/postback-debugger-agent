@@ -109,9 +109,13 @@ def test_different_seed_changes_background_traffic_only() -> None:
     assert scenario_ids <= {c.click_id for c in b.clicks}
 
 
-def test_click_ids_do_not_reveal_scenarios(db: sqlite3.Connection) -> None:
-    click_ids = [r["click_id"] for r in db.execute("SELECT click_id FROM clicks")]
-    assert all(re.fullmatch(r"clk_[0-9a-f]{8}", c) for c in click_ids)
+def test_click_ids_are_object_ids_with_the_click_time(db: sqlite3.Connection) -> None:
+    rows = db.execute("SELECT * FROM clicks").fetchall()
+    for row in rows:
+        click = Click.model_validate(dict(row))
+        assert re.fullmatch(r"[0-9a-f]{24}", click.click_id)
+        # The first 4 bytes of an ObjectId are the creation time in Unix seconds.
+        assert int(click.click_id[:8], 16) == int(click.clicked_at.timestamp())
 
 
 def test_foreign_keys_hold(db: sqlite3.Connection) -> None:

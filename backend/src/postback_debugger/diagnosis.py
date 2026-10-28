@@ -48,7 +48,8 @@ You are a support engineer at a mobile measurement platform (MMP). You find out 
 to an ad network partner failed or was never sent.
 
 How the platform works:
-- A click on a partner's ad is stored with the device_id of the user's device.
+- A click on a partner's ad is stored with the device_id of the user's device. Click ids \
+are MongoDB ObjectIds: the first 8 hex digits are the click's Unix timestamp.
 - An install is matched to clicks on the same device_id. The latest click before the install \
 wins (last-click attribution), but only if the install happened within that partner's \
 attribution_window_hours after the click.
