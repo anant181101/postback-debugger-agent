@@ -36,6 +36,9 @@ from postback_debugger.data.models import (
 from postback_debugger.data.scenarios import SCENARIOS
 
 DEFAULT_SEED = 42
+# ObjectId parts shared by every synthetic click, like one MMP tracking server would produce.
+OBJECT_ID_PROCESS = "9e4c2a71d3"
+OBJECT_ID_FIRST_COUNTER = 0x5B3C40  # above the counters used by the hard-coded scenario ids
 BASE_TIME = datetime(2026, 10, 1, tzinfo=UTC)
 APP_IDS = {Platform.ANDROID: "com.example.puzzlequest", Platform.IOS: "id6400000001"}
 
@@ -144,6 +147,7 @@ class Dataset:
         self.installs: list[Install] = []
         self.events: list[Event] = []
         self.postback_logs: list[PostbackLog] = []
+        self._object_id_counter = OBJECT_ID_FIRST_COUNTER
 
     def tables(self) -> dict[str, Sequence[BaseModel]]:
         """Records per table, in foreign-key order (parents first)."""
@@ -158,6 +162,14 @@ class Dataset:
     def new_id(self, prefix: str, hex_digits: int = 12) -> str:
         return f"{prefix}_{self.rng.getrandbits(hex_digits * 4):0{hex_digits}x}"
 
+    def new_click_id(self, clicked_at: datetime) -> str:
+        """A MongoDB ObjectId: 4-byte Unix timestamp, 5-byte process id, 3-byte counter."""
+        self._object_id_counter += 1
+        return (
+            f"{int(clicked_at.timestamp()):08x}{OBJECT_ID_PROCESS}"
+            f"{self._object_id_counter & 0xFFFFFF:06x}"
+        )
+
     def add_click(
         self,
         partner_id: str,
@@ -171,7 +183,7 @@ class Dataset:
         if partner_id not in self.partners:
             raise ValueError(f"unknown partner: {partner_id}")
         click = Click(
-            click_id=click_id or self.new_id("clk", 8),
+            click_id=click_id or self.new_click_id(clicked_at),
             partner_id=partner_id,
             campaign_id=campaign_id,
             app_id=APP_IDS[platform],

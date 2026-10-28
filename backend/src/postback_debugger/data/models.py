@@ -78,8 +78,11 @@ class Partner(Record):
         return value
 
 
+OBJECT_ID_PATTERN = r"^[0-9a-f]{24}$"
+
+
 class Click(Record):
-    click_id: str
+    click_id: str = Field(pattern=OBJECT_ID_PATTERN)  # MongoDB ObjectId, as in real MMPs
     partner_id: str
     campaign_id: str
     app_id: str

@@ -2,6 +2,9 @@
 
 Used by tests and evals only. The agent must never read this module, because it contains
 the expected answers. Click IDs are deliberately opaque so they do not hint at the cause.
+
+Click IDs are MongoDB ObjectIds, as in real MMPs: 8 hex digits of Unix timestamp (the
+click time set in seed.py), 10 of process id, 6 of counter. test_seed checks they match.
 """
 
 from dataclasses import dataclass
@@ -18,58 +21,58 @@ class Scenario:
 
 SCENARIOS: tuple[Scenario, ...] = (
     Scenario(
-        "clk_3f9a1c07",
+        "6abe2f209e4c2a71d35b3c01",
         FailureType.NONE,
         "Install and purchase postbacks were delivered to AlphaAds.",
     ),
     Scenario(
-        "clk_8b24e6d1",
+        "6abf80a09e4c2a71d35b3c02",
         FailureType.NO_INSTALL,
         "The click never led to an install, so no postback was expected.",
     ),
     Scenario(
-        "clk_c71d0f5a",
+        "6ac0c4109e4c2a71d35b3c03",
         FailureType.ATTRIBUTED_TO_OTHER_CLICK,
         "A later GammaNetwork click on the same device won last-click attribution.",
     ),
     Scenario(
-        "clk_19e4b8c3",
+        "6ac223a09e4c2a71d35b3c04",
         FailureType.OUTSIDE_ATTRIBUTION_WINDOW,
         "The install came 9 days after the click; AlphaAds has a 7-day window.",
     ),
     Scenario(
-        "clk_e05a7f92",
+        "6ac391409e4c2a71d35b3c05",
         FailureType.FRAUD_REJECTED,
         "The install was rejected by fraud checks (click-to-install time of 4 seconds).",
     ),
     Scenario(
-        "clk_6d3c91be",
+        "6ac4c6a09e4c2a71d35b3c06",
         FailureType.EVENT_NOT_MAPPED,
         "Event 'purchase_v2' is missing from the AlphaAds event mapping, so it was never sent.",
     ),
     Scenario(
-        "clk_a4f2083d",
+        "6aca0ca09e4c2a71d35b3c07",
         FailureType.PARTNER_4XX,
         "DeltaReach returned 401 because the configured API key expired before the postback.",
     ),
     Scenario(
-        "clk_52b9d4e7",
+        "6ac618209e4c2a71d35b3c08",
         FailureType.PARTNER_5XX,
         "GammaNetwork returned 503 on all 3 attempts.",
     ),
     Scenario(
-        "clk_f8c6a215",
+        "6ac769a09e4c2a71d35b3c09",
         FailureType.TIMEOUT,
         "GammaNetwork did not respond within its 2000 ms timeout on all 3 attempts.",
     ),
     Scenario(
-        "clk_0e7b3fa9",
+        "6acb5e209e4c2a71d35b3c0a",
         FailureType.MISSING_MACRO,
         "The iOS user opted out of tracking, so {advertising_id} was left unresolved "
         "and BetaMedia returned 400.",
     ),
     Scenario(
-        "clk_b3a85c60",
+        "6accafa09e4c2a71d35b3c0b",
         FailureType.DUPLICATE,
         "The SDK tracked the same purchase twice; AlphaAds rejected the second with 409.",
     ),
