@@ -258,7 +258,7 @@ button:disabled {
 
 .app {
   display: grid;
-  grid-template-columns: 272px minmax(0, 1fr);
+  grid-template-columns: 288px minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -464,19 +464,20 @@ button:disabled {
 
 .scenario-id {
   color: var(--text);
-  font-size: 12.5px;
+  font-size: 11.5px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .scenario-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 1px;
   font-size: 11.5px;
   color: var(--muted);
-}
-
-.scenario-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
 }
 
 .platform {
