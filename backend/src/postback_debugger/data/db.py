@@ -14,9 +14,21 @@ def default_db_path() -> Path:
     return Path(os.environ.get("POSTBACK_DB_PATH") or DEFAULT_DB_PATH)
 
 
-def connect(path: Path | str) -> sqlite3.Connection:
-    """Open a connection that returns rows as sqlite3.Row and enforces foreign keys."""
-    conn = sqlite3.connect(path)
+def connect(
+    path: Path | str, *, read_only: bool = False, check_same_thread: bool = True
+) -> sqlite3.Connection:
+    """Open a connection that returns rows as sqlite3.Row and enforces foreign keys.
+
+    With read_only=True the file is opened in SQLite's read-only mode: any write raises
+    sqlite3.OperationalError, and a missing file is an error instead of a new empty DB.
+    check_same_thread=False allows handing the connection to another thread (web server
+    workers); the caller must still use it from one thread at a time.
+    """
+    if read_only:
+        uri = f"{Path(path).resolve().as_uri()}?mode=ro"
+        conn = sqlite3.connect(uri, uri=True, check_same_thread=check_same_thread)
+    else:
+        conn = sqlite3.connect(path, check_same_thread=check_same_thread)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
